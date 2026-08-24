@@ -1,7 +1,6 @@
 #include "emulation_core.h"
 #include "audio_output.h"
 #include "emulation_callbacks.h"
-#include "engine_widescreen_bridge.h"
 #include "renderer.h"
 
 #include <algorithm>
@@ -198,12 +197,8 @@ void EmulationCore::receiveVideo(const void *pixels, unsigned width,
   // so would briefly expose the DOSBox or DOS/4GW startup screen.
   if (!themepark_guest_frame_is_renderable())
     return;
-  // The importer enlarges the retail surfaces before DOS/4GW starts, while the
-  // embedded bridge verifies the matching engine revision and reads the wider
-  // authoritative buffer.  Never present a half-applied patch: the ordinary
-  // VGA/VESA callback remains a safe fallback on an unsupported executable.
-  if (applyThemeParkWidescreen() && presentThemeParkWidescreen(*renderer_))
-    return;
+  // The stable branch preserves Theme Park's authoritative 4:3 framebuffer.
+  // The renderer scales that complete image without modifying engine memory.
   renderer_->updateFrame(pixels, width, height, pitch);
 }
 

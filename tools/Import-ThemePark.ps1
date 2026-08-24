@@ -9,7 +9,6 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Windows.Forms
-. (Join-Path $PSScriptRoot 'Patch-ThemePark.ps1')
 
 # Theme Park's PC CD keeps music and sound effects in DATA files rather than
 # Red Book audio tracks.  Consequently ISO is a complete source for this game;
@@ -130,7 +129,6 @@ try {
     Copy-Item -Path (Join-Path $game '*') -Destination $data -Recurse -Force
     New-Item -ItemType Directory -Path (Join-Path $data 'SAVE') -Force | Out-Null
     Repair-ThemeParkMouseFreeze (Join-Path $data 'MAIN.EXE')
-    Repair-ThemeParkWidescreen (Join-Path $data 'MAIN.EXE')
 
     # These are precisely the settings the DOS setup program would write for
     # DOSBox Pure's emulated SB16 and OPL hardware.  Keeping this as text makes
@@ -148,7 +146,7 @@ try {
         files = $files
         audio = 'file-based SB16 effects and AdLib music'
         mouseCompatibility = 'VGA/VESA freeze repaired in imported copy'
-        widescreenCompatibility = 'reviewed engine framebuffer patch applied'
+        displayCompatibility = 'original 4:3 framebuffer retained'
     }
     $manifest | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $install 'import-manifest.json') -Encoding utf8
     Show-ImportMessage "Theme Park was imported successfully ($files files)." Information

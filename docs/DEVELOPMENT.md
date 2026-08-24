@@ -2,60 +2,28 @@
 
 ## Rules
 
-- Explain reasons, invariants, and original behavior—not obvious punctuation.
-- Keep every code or script file below 300 lines.
-- Split by responsibility before a module becomes difficult to scan.
-- Treat warnings as errors.
-- Never add game files, screenshots, music, or generated imports.
-- Preserve original behavior behind compatibility interfaces; enhancements are
-  optional policy layers.
+- Build only with Visual Studio 2022/MSVC on Windows.
+- Keep every authored code or script file below 300 lines.
+- Comment reasons, original behavior, and safety checks in novice-readable text.
+- Never commit imported game data, saves, logs, or generated build output.
+- Make release changes in source/importer/staging code, never only in a test
+  installation.
+- Require a clean-CD import to reproduce the final staged runtime.
 
-## C++ orientation
+## Verification
 
-Headers describe what a module offers; `.cpp` files explain how. `ComPtr<T>`
-automatically releases Windows graphics objects. `std::filesystem::path` safely
-represents paths. Windows calls returning `HRESULT` are checked with `FAILED`.
+1. Run `tools/Check-Repository.ps1`.
+2. Build `ThemePark2Native.sln` as Release x64 with zero warnings.
+3. Stage through `build-release.ps1 -RuntimeDirectory <path>`.
+4. Import a clean supported CD image using the staged importer.
+5. Verify low and high resolution, mouse capture, fullscreen round trips, SFX,
+   music, keyboard, controller, save states, Escape, and game-exit shutdown.
+6. Confirm the loading art hides all text-mode DOS/DOSBox/DOS4GW frames.
+7. Confirm source/runtime hashes and that only Windows system DLLs are external.
 
-The window procedure is a callback invoked by Windows. It forwards events to
-the renderer, emulation boundary and `InputMapper`; the rest of the application
-uses ordinary C++ classes. Raw mouse input is relative and must be snapshotted
-in `inputPoll`, because libretro may query one axis several times per frame.
+## Branch policy
 
-## Verification checklist
-
-1. Build `ThemePark2Native.sln` as Release x64 with Visual Studio 2022/MSVC;
-   require zero warnings. This is the sole supported toolchain.
-2. Every code/script file below 300 lines.
-3. BIN/CUE import completes.
-4. All 355 data hashes match the known corpus.
-5. FLAC verifies tracks 2-9.
-6. CRT shader compiles.
-7. Test scale modes, resize and repeated fullscreen/window transitions.
-8. Test mouse capture/release in both modes and disconnect an active controller.
-9. Verify audible AdLib effects and CD tracks 2-9 independently. With
-   `THEMEPARK_LOG`, a known effect must also produce an OPL2 key-on trace.
-10. Search the public tree for assets and machine-specific paths.
-11. Use `dumpbin /DEPENDENTS` to confirm the EXE has only Windows system DLLs;
-    DOSBox Pure and the MSVC runtime are linked into the executable.
-
-## Widescreen and refresh tests
-
-The 426x200 compositor requires a room-by-room matrix covering exposed voids,
-uninitialized tiles, hidden triggers, premature enemy activation, scripted
-scenes, camera bounds, mouse hit-testing, and each 4:3 compatibility override.
-
-High-refresh work must compare gameplay speed, script timing, combat, audio/CD
-timing, and serialized states against the measured baseline. Test 60, 90, 120,
-and 144 Hz presentation while simulation remains unchanged. Interpolation tests
-must verify HUD exclusion and prove that saving/loading is frame-rate invariant.
-Interpolation and waitable one-frame DXGI pacing are the sole presentation
-path. Set `THEMEPARK_ENGINE_LOG` to an absolute file to record symbol-backed
-camera state.
-
-Run `tools/Inspect-HeimdallSymbols.ps1 -Executable <H2PC.EXE> -OutputCsv <file>`
-to reproduce symbol addresses from a legally imported executable. Generated
-CSV belongs in a work directory and must not be committed.
-
-Third-party helper licenses live in `tools/licenses/` beside distributed tools.
-The CRT shader is also code: its entry file assembles balanced, ordered modules,
-each below the same limit. Do not join those modules into one monolithic effect.
+`main` retains the working 4:3 engine framebuffer. Experimental true widescreen
+development belongs on `widescreen-test` until both engine modes and a complete
+gameplay audit pass. Do not test an experimental binary against stable imported
+data without re-importing, because the experimental importer changes MAIN.EXE.

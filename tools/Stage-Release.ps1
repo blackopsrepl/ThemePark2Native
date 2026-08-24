@@ -76,11 +76,21 @@ Assert-DirectoryParity $shaderSource $shaderDestination
 
 # Only end-user importer tools belong in the release.  Contributor checks and
 # symbol-inspection utilities remain in the source repository.
-$toolFiles = @('7z.exe', '7z.dll', 'Import-ThemePark.ps1', 'Patch-ThemePark.ps1')
+$toolFiles = @('7z.exe', '7z.dll', 'Import-ThemePark.ps1')
 $toolDestination = Join-Path $destinationPath 'tools'
 New-Item -ItemType Directory -Path $toolDestination -Force | Out-Null
 foreach ($name in $toolFiles) {
     Copy-VerifiedFile (Join-Path $PSScriptRoot $name) (Join-Path $toolDestination $name)
+}
+
+# Existing developer/test installations may still contain the experimental
+# executable patcher from the widescreen branch.  It is not part of the stable
+# release and could otherwise mislead a user into modifying freshly imported
+# game data.  Remove only this explicitly named obsolete helper; imported game
+# files and every other user-owned file remain untouched.
+$obsoletePatcher = Join-Path $toolDestination 'Patch-ThemePark.ps1'
+if (Test-Path -LiteralPath $obsoletePatcher -PathType Leaf) {
+    Remove-Item -LiteralPath $obsoletePatcher -Force
 }
 
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'licenses') -Destination $toolDestination -Recurse -Force

@@ -35,7 +35,6 @@
     <ClCompile Include="src\emulation_core.cpp" />
     <ClCompile Include="src\emulation_environment.cpp" />
     <ClCompile Include="src\emulation_input.cpp" />
-    <ClCompile Include="src\engine_widescreen_bridge.cpp" />
     <ClCompile Include="src\game_install.cpp" />
     <ClCompile Include="src\input_mapper.cpp" />
     <ClCompile Include="src\main.cpp" />
