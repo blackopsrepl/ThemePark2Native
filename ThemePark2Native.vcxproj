@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64"><Configuration>Debug</Configuration><Platform>x64</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64"><Configuration>Release</Configuration><Platform>x64</Platform></ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion><Keyword>Win32Proj</Keyword><ProjectGuid>{42CD93AF-5BB7-4E42-A246-1CE4D28A69C0}</ProjectGuid><RootNamespace>ThemePark2Native</RootNamespace><WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration"><ConfigurationType>Application</ConfigurationType><UseDebugLibraries>true</UseDebugLibraries><PlatformToolset>v143</PlatformToolset><CharacterSet>NotSet</CharacterSet></PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration"><ConfigurationType>Application</ConfigurationType><UseDebugLibraries>false</UseDebugLibraries><PlatformToolset>v143</PlatformToolset><WholeProgramOptimization>true</WholeProgramOptimization><CharacterSet>NotSet</CharacterSet></PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup>
+    <OutDir>$(ProjectDir)build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)build\obj\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>ThemePark2Native</TargetName>
+    <DosboxPureRoot>$(ProjectDir)build\generated\dosbox-pure</DosboxPureRoot>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile><WarningLevel>Level4</WarningLevel><TreatWarningAsError>true</TreatWarningAsError><LanguageStandard>stdcpp20</LanguageStandard></ClCompile>
+    <Link><SubSystem>Windows</SubSystem><AdditionalDependencies>d3d11.lib;dxgi.lib;d3dcompiler.lib;windowscodecs.lib;ole32.lib;shcore.lib;xaudio2.lib;xinput.lib;%(AdditionalDependencies)</AdditionalDependencies></Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+    <ClCompile><RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary></ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+    <ClCompile><RuntimeLibrary>MultiThreaded</RuntimeLibrary></ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\app.cpp" />
+    <ClCompile Include="src\audio_output.cpp" />
+    <ClCompile Include="src\cursor_visibility.cpp" />
+    <ClCompile Include="src\emulation_callbacks.cpp" />
+    <ClCompile Include="src\emulation_core.cpp" />
+    <ClCompile Include="src\emulation_environment.cpp" />
+    <ClCompile Include="src\emulation_input.cpp" />
+    <ClCompile Include="src\engine_widescreen_bridge.cpp" />
+    <ClCompile Include="src\game_install.cpp" />
+    <ClCompile Include="src\input_mapper.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\renderer_content.cpp" />
+    <ClCompile Include="src\renderer_device.cpp" />
+    <ClCompile Include="src\widescreen_policy.cpp" />
+    <ClCompile Update="src\*.cpp">
+      <PreprocessorDefinitions>UNICODE;_UNICODE;WIN32_LEAN_AND_MEAN;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemGroup>
+  <!--
+    DOSBox Pure is part of this application, not another project or a DLL.
+    build-release.ps1 expands its GPL source archive before MSBuild evaluates
+    these wildcards.  Per-file settings isolate upstream warning/style choices
+    from the stricter rules used by our own novice-readable host code.
+  -->
+  <ItemGroup>
+    <ClCompile Include="$(DosboxPureRoot)\*.cpp;$(DosboxPureRoot)\src\**\*.cpp">
+      <AdditionalIncludeDirectories>$(DosboxPureRoot)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>__LIBRETRO__;STATIC_LINKING;WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WarningLevel>Level2</WarningLevel>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <ObjectFileName>$(IntDir)dosbox-pure\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\app.h" />
+    <ClInclude Include="src\audio_output.h" />
+    <ClInclude Include="src\cursor_visibility.h" />
+    <ClInclude Include="src\emulation_callbacks.h" />
+    <ClInclude Include="src\emulation_core.h" />
+    <ClInclude Include="src\game_install.h" />
+    <ClInclude Include="src\input_mapper.h" />
+    <ClInclude Include="src\presentation_shader.h" />
+    <ClInclude Include="src\renderer.h" />
+    <ClInclude Include="src\widescreen_policy.h" />
+    <ClInclude Include="src\libretro_api.h" />
+    <ClInclude Include="src\resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ThemePark2Native.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ThemePark-Widescreen.ini" />
+    <None Include="tools\Import-ThemePark.ps1" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

@@ -1,0 +1,6 @@
+#include "src/resource.h"
+#include <windows.h>
+
+// Embedding the multi-resolution ICO makes the icon part of the executable;
+// an installed game therefore does not need a separate image beside the EXE.
+IDI_THEMEPARK_NATIVE ICON "assets\\ThemePark2Native.ico"

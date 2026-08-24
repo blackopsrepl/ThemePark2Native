@@ -1,0 +1,55 @@
+diff --git a/source/d3d10/d3d10_device.cpp b/source/d3d10/d3d10_device.cpp
+index 82f014e..6575d9d 100644
+--- a/source/d3d10/d3d10_device.cpp
++++ b/source/d3d10/d3d10_device.cpp
+@@ -10,6 +10,7 @@
+ #include "com_utils.hpp"
+ #include "hook_manager.hpp"
+ #include "addon_manager.hpp"
++#include <intrin.h> // Declares the MSVC _ReturnAddress compiler intrinsic.
+ 
+ using reshade::d3d10::to_handle;
+ 
+diff --git a/source/d3d11/d3d11_device.cpp b/source/d3d11/d3d11_device.cpp
+index 33eb60e..e100cfb 100644
+--- a/source/d3d11/d3d11_device.cpp
++++ b/source/d3d11/d3d11_device.cpp
+@@ -12,6 +12,7 @@
+ #include "com_utils.hpp"
+ #include "hook_manager.hpp"
+ #include "addon_manager.hpp"
++#include <intrin.h> // Declares the MSVC _ReturnAddress compiler intrinsic.
+ 
+ using reshade::d3d11::to_handle;
+ 
+diff --git a/source/runtime.cpp b/source/runtime.cpp
+index 6ecefd3..2952373 100644
+--- a/source/runtime.cpp
++++ b/source/runtime.cpp
+@@ -3371,7 +3371,9 @@ void reshade::runtime::reload_effects(bool force_load_all)
+ 
+ #if RESHADE_GUI
+ 	_preset_is_modified = false;
+-	_show_splash = true; // Always show splash bar when reloading everything
++	// The host supplies its own loading presentation, including during a full
++	// effect reload. Keep the injector implementation invisible to players.
++	_show_splash = false;
+ 	_reload_count++;
+ #endif
+ 	_last_reload_successful = true;
+diff --git a/source/runtime.hpp b/source/runtime.hpp
+index f743f27..057683c 100644
+--- a/source/runtime.hpp
++++ b/source/runtime.hpp
+@@ -419,7 +419,10 @@ namespace reshade
+ 		#pragma region Overlay
+ 		ImGuiContext *_imgui_context = nullptr;
+ 
+-		bool _show_splash = true;
++		// ThemePark2Native owns startup presentation. The standard five-second
++		// ReShade banner would cover the official CD loading art and leak an
++		// implementation detail to players, so this private build never creates it.
++		bool _show_splash = false;
+ 		bool _show_overlay = false;
+ 		unsigned int _show_fps = 2;
+ 		unsigned int _show_clock = false;

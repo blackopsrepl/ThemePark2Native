@@ -1,0 +1,13 @@
+build/
+data/
+music/
+import-work/
+music-manifest.json
+Heimdall2Native.exe
+preview.gif
+ReShade.log
+reshade-cache/
+*.pdb
+*.user
+*.suo
+.vs/
