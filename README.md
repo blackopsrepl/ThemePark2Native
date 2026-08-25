@@ -127,10 +127,6 @@ who are new to C++ and emulation projects.
 - [Packaging public builds](docs/DISTRIBUTION.md)
 - [Third-party components](docs/THIRD-PARTY.md)
 
-The `main` branch is the stable original-framebuffer development baseline. The
-`widescreen-test` branch preserves incomplete reverse-engineering experiments
-and is not recommended for normal testing.
-
 ## Legal
 
 The source is licensed under [GPL-2.0-only](LICENSE) because the executable
