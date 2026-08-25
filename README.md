@@ -1,61 +1,143 @@
 # Theme Park Native
 
 Theme Park Native is an unofficial Windows 11 modernization layer for the 1994
-PC CD release of **Theme Park** by Bullfrog Productions. It starts the original
-game directly in a native window while keeping its private DOS compatibility
-layer, setup process, and emulator menu invisible.
+PC CD release of **Theme Park** by Bullfrog Productions. It launches the
+original game directly in a native window—without exposing a DOS prompt,
+installer, DOS/4GW splash, or emulator menu—and integrates modern video, audio,
+mouse, keyboard, and Xbox controller handling.
 
-No playable original game executable or asset library is included. On first
-launch, select an ISO or BIN/CUE image made from a legally owned Theme Park CD.
+> [!WARNING]
+> **This project is not currently playable.** CPU timing is constrained enough
+> to keep the simulation near its intended speed, but map scrolling remains
+> severely slow and clunky. Raising the emulated CPU rate restores scrolling
+> responsiveness but makes the simulation run too fast. Resolving those two
+> clocks independently is the main release blocker. This repository is public
+> for development and testing, not as a finished replacement for the original.
 
-## Current features
+![Theme Park running through the native Windows host](docs/images/high-resolution.jpg)
 
-- One native x64 Windows executable built with Visual Studio and Direct3D 11.
+| Original VGA mode | High-resolution VESA mode |
+|---|---|
+| ![Theme Park gameplay in its original VGA mode](docs/images/gameplay.jpg) | ![Theme Park gameplay in its 640x480 VESA mode](docs/images/high-resolution.jpg) |
+
+The repository contains **no playable original game program or extractable
+game asset library**. Testers must own the PC CD version and import its
+executable, artwork, data, music, and sound effects from their own disc image.
+
+## Implemented so far
+
+- One native x64 Windows executable, built with Visual Studio and Direct3D 11.
+- An embedded compatibility engine; DOS startup and emulator UI remain hidden.
 - Direct first-run CD import; the obsolete DOS installer is never shown.
-- Automatic SB16 sound-effects and AdLib music configuration at unity gain.
-- Fixed period-correct CPU pacing; it never falls through to an unbounded
-  modern CPU clock.
-- Correct VGA pixel aspect plus support for Theme Park's 640x480 VESA mode.
-- Edge-aware scaling, restrained sharpening, and a configurable CRT shader.
-- Immediate absolute mouse tracking plus a verified compatibility patch for
-  Theme Park's original VGA/VESA cursor-freeze bug.
-- V-synchronized flip-model presentation and optional save states.
+- Original 320x200 VGA and 640x480 VESA modes at their intended aspect ratio.
+- Edge-aware reconstruction, restrained sharpening, and a configurable CRT
+  simulation with scanlines, phosphor mask, glow, and halation.
+- Sound Blaster sound effects and AdLib music at unity gain.
+- Immediate mouse tracking with a compatibility repair for the original
+  VGA/VESA cursor-freeze bug.
+- XInput controller support, v-synchronized flip-model presentation,
+  fullscreen switching, and optional save states.
 
-## Install
+## Current blocker: scrolling and simulation timing
 
-1. Extract the complete release to a writable directory.
-2. Run `ThemePark2Native.exe`.
-3. Select the `.iso` or `.cue` file belonging to your Theme Park PC CD.
-4. Wait for validation and extraction; the game then starts directly.
+Theme Park couples several visible behaviors to the emulated CPU rate. At the
+rate that keeps construction, visitors, finances, animations, and other
+simulation systems close to original speed, edge scrolling is unacceptably
+slow and uneven. Increasing the rate makes scrolling feel better but accelerates
+the entire game.
 
-Unlike mixed-mode CD games, this edition keeps music and effects in its own
-`MUSIC*.DAT` and `SNDS*.DAT` files. A normal ISO therefore contains the complete
-audio and no separate CD-track conversion is required.
+A proper fix must identify and separate the scrolling/input cadence from the
+authoritative simulation clock. Simply increasing cycles, inserting native
+frame interpolation, or smoothing the mouse does not solve the underlying
+coupling. Until that work is complete, the project must be considered
+unplayable despite the working launch, graphics, sound, and input paths.
+
+## What testers need
+
+- 64-bit Windows 11.
+- A Direct3D 11-capable graphics adapter.
+- A legally owned PC CD image of Theme Park.
+
+Unlike mixed-mode CD games, Theme Park stores its music and effects in game
+data files. A normal ISO contains the complete soundtrack and sound library;
+separate CD-audio extraction is not required. BIN/CUE and ZIP sources are also
+accepted by the importer.
+
+## Install for testing
+
+1. Download a test build and extract the complete archive to a writable folder.
+   Do not run the executable from inside the ZIP file.
+2. Start `ThemePark2Native.exe`.
+3. On first launch, select your `.iso`, `.cue`, or `.zip` CD image.
+4. Wait while the wizard validates and extracts the original game files.
+5. The game starts directly; its DOS installer does not need to be run.
+
+Later launches use the imported files automatically. The installation is
+portable: move the entire folder together and it will continue to work.
 
 ## Controls
 
-- Mouse: point and click exactly as in the original game.
-- `Alt+Enter`: toggle fullscreen.
-- `Ctrl+F10`: release captured mouse.
-- `Ctrl+F5` / `Ctrl+F9`: save/load the quick state.
-- Xbox right stick: pointer; `A` or right trigger: left click; `B` or left
-  trigger: right click; D-pad: menu arrows; `X`: fireworks; `Y`: open park;
-  Menu: pause; View: Escape.
+| Action | Keyboard and mouse | Xbox controller |
+|---|---|---|
+| Point | Mouse | Right stick |
+| Left click | Left mouse button | `A` or right trigger |
+| Right click | Right mouse button | `B` or left trigger |
+| Menu navigation | Arrow keys | D-pad |
+| Toggle VGA/VESA mode | `R` | — |
+| Fireworks | `F` | `X` |
+| Open park | `O` | `Y` |
+| Pause | `P` | Menu |
+| Game Escape action | `Esc` | View |
+| Toggle fullscreen | `Alt+Enter` | — |
+| Release captured mouse | `Ctrl+F10` | — |
+| Save / load state | `Ctrl+F5` / `Ctrl+F9` | — |
 
-## Build
+The Windows pointer is hidden over the active game and returns when the window
+loses focus. When the original game exits, the native window exits with it.
+See [the complete controls guide](docs/CONTROLS.md) for input details.
 
-Install Visual Studio 2022 with **Desktop development with C++**, then build
-`ThemePark2Native.sln` as `Release | x64` or run:
+## Building from source
+
+Install Visual Studio 2022 with **Desktop development with C++** and a Windows
+SDK. Open `ThemePark2Native.sln` and build `Release | x64`, or use:
 
 ```powershell
 .\build-release.ps1
 ```
 
-The project uses MSVC and the Windows SDK only—no WSL or MinGW. Authored code,
-scripts, and shader modules remain below 300 lines per file.
+To build and assemble a test directory in one operation:
 
-## License
+```powershell
+.\build-release.ps1 -RuntimeDirectory 'C:\Games\Theme Park'
+```
 
-This project is licensed under [GPL-2.0-only](LICENSE) because its monolithic
-executable embeds DOSBox Pure. Theme Park and all original game content belong
-to their respective owners. This is an unofficial interoperability project.
+The project uses MSVC only; WSL, MinGW, Java, and a separate compatibility-core
+build are not part of the build or user installation. Authored code, scripts,
+and shader modules stay below 300 lines per file and are commented for readers
+who are new to C++ and emulation projects.
+
+## Documentation
+
+- [Architecture](docs/ARCHITECTURE.md)
+- [Rendering and scaling](docs/RENDERING.md)
+- [Disc import](docs/IMPORTING.md)
+- [Music and sound effects](docs/MUSIC.md)
+- [Engine research](docs/ENGINE-HOOKS.md)
+- [Development guide](docs/DEVELOPMENT.md)
+- [Packaging public builds](docs/DISTRIBUTION.md)
+- [Third-party components](docs/THIRD-PARTY.md)
+
+The `main` branch is the stable original-framebuffer development baseline. The
+`widescreen-test` branch preserves incomplete reverse-engineering experiments
+and is not recommended for normal testing.
+
+## Legal
+
+The source is licensed under [GPL-2.0-only](LICENSE) because the executable
+embeds DOSBox Pure. Third-party components retain their own notices, documented
+in [docs/THIRD-PARTY.md](docs/THIRD-PARTY.md).
+
+This is an unofficial preservation and interoperability project. Theme Park,
+Bullfrog, Electronic Arts, and all original game content belong to their
+respective owners. The small screenshots above document interoperability; the
+executable cannot use them as game data.

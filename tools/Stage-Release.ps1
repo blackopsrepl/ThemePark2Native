@@ -74,6 +74,19 @@ New-Item -ItemType Directory -Path $shaderDestination -Force | Out-Null
 Copy-Item -Path (Join-Path $shaderSource '*') -Destination $shaderDestination -Recurse -Force
 Assert-DirectoryParity $shaderSource $shaderDestination
 
+# The installed README links to the controls guide and the same two gameplay
+# screenshots shown on the repository front page.  Stage only those user-facing
+# documents; contributor and reverse-engineering notes remain in the source
+# repository.
+$docsDestination = Join-Path $destinationPath 'docs'
+$imageDestination = Join-Path $docsDestination 'images'
+New-Item -ItemType Directory -Path $imageDestination -Force | Out-Null
+Copy-VerifiedFile (Join-Path $repository 'docs\CONTROLS.md') (Join-Path $docsDestination 'CONTROLS.md')
+$releaseImages = @('gameplay.jpg', 'high-resolution.jpg')
+foreach ($name in $releaseImages) {
+    Copy-VerifiedFile (Join-Path $repository "docs\images\$name") (Join-Path $imageDestination $name)
+}
+
 # Only end-user importer tools belong in the release.  Contributor checks and
 # symbol-inspection utilities remain in the source repository.
 $toolFiles = @('7z.exe', '7z.dll', 'Import-ThemePark.ps1')
