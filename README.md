@@ -1,5 +1,16 @@
 # Theme Park Native
 
+> **Status: retired — repository archived.** This DOS-hosted implementation is
+> replaced by a native static recompilation of the game's own 32-bit code,
+> [sp00nznet/themepark-recomp](https://github.com/sp00nznet/themepark-recomp)
+> (MIT), which runs without an emulator and without a DOS layer and supersedes
+> every feature of this project: native window, fixed pacing, the 640x480 VESA
+> park, CRT presentation, save states, modern mouse and pad input. This
+> repository remains as a reference for two portable ideas — frame-interpolated
+> presentation at a fixed simulation rate, and nonlinear pad response tuning —
+> and for its CD/RNC import pipeline. Theme Park is © 1994 Bullfrog Productions
+> / Electronic Arts; the recomp ships no game content and needs your own copy.
+
 Theme Park Native is an unofficial Windows 11 modernization layer for the 1994
 PC CD release of **Theme Park** by Bullfrog Productions. It launches the
 original game directly in a native window—without exposing a DOS prompt,
